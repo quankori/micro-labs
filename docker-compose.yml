@@ -26,8 +26,35 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data
 
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379" # Redis default port
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+
+  localstack:
+    image: localstack/localstack:latest
+    container_name: localstack
+    ports:
+      - "4566:4566" # Main API port
+      - "4572:4572" # S3 service port
+    environment:
+      - SERVICES=s3,redis
+      - DEFAULT_REGION=us-east-1
+      - DATA_DIR=/tmp/localstack/data
+    volumes:
+      - localstack_data:/tmp/localstack
+    restart: unless-stopped
+
 volumes:
   mongo-data:
     driver: local
   postgres-data:
+    driver: local
+  redis_data:
+    driver: local
+  localstack_data:
     driver: local
